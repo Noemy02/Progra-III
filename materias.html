@@ -1,0 +1,75 @@
+<form method="post" id="frmMaterias" data-idmateria="-1" data-accion="nuevo">
+    <div class="card text-bg-dark mb-3" style="width: 600px;">
+        <div class="card-header border-success">
+            <div data-bs-theme="dark" class="d-flex">
+                <div>Registro de Materias</div>
+                <div class="ms-auto">
+                    <button type="button" class="btn-close close" data-form="materias"></button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row p-1">
+                <div class="col-3">NOMBRE:</div>
+                <div class="col-3">
+                    <input required type="text" name="txtNombreMaterias" id="txtNombreMaterias" class="form-control">
+                </div>
+            </div>
+            <div class="row p-1">
+                <div class="col-3">CODIGO:</div>
+                <div class="col-6">
+                    <input required type="text" name="txtCodigoMaterias" id="txtCodigoMaterias" class="form-control">
+                </div>
+            </div>
+            <div class="row p-1">
+                <div class="col-3">DESCRIPCION:</div>
+                <div class="col-9">
+                    <input required type="text" name="txtDescripcionMaterias" id="txtDescripcionMaterias" class="form-control">
+                </div>
+        </div>
+        <div class="card-footer bg-transparent border-success">
+            <div class="row">
+                <div class="col text-center">
+                    <input type="reset" value="Nuevo" class="btn btn-danger">
+                    <input type="submit" value="Guardar" class="btn btn-success">
+                    <button id="btnBuscarDocente" class="btn btn-primary">Buscar Materia</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<script>
+    btnBuscarMateria.addEventListener('click', event=>{
+        event.preventDefault();
+        abrirVentana('busqueda_materias');
+        $element.show();
+    });
+    frmDocentes.addEventListener("submit",event=>{
+        event.preventDefault();
+        let datos = {
+            accion : frmMaterias.dataset.accion,
+            idMateria: frmMaterias.dataset.idmateria,
+            nombre: txtNombreMaterias.value,
+            codigo: txtCodigoMaterias.value,
+            descripcion: txtDescripcionMaterias.value,
+        };
+        fetch("/materias", {
+            method: "POST",
+            body: JSON.stringify(datos)
+        }).then(resp=>resp.json())
+        .then(respuesta=>{
+            if( respuesta.msg=="ok" ){
+                limpiarDatosMaterias();
+                mostrarDatosMaterias();
+            }
+        });
+    });
+    
+    function limpiarDatosMaterias(){
+        frmMaterias.dataset.accion = "nuevo";
+        frmMaterias.dataset.idmateria = "-1";
+        txtNombreMaterias.value = "";
+        txtCodigoMaterias.value = "";
+        txtDescripcionMaterias.value = "";
+    }
+</script>

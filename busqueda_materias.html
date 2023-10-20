@@ -1,0 +1,84 @@
+<div class="card text-bg-dark mb-3" style="width: 750px;">
+    <div class="card-header border-success">
+        <div data-bs-theme="dark" class="d-flex">
+            <div>Consulta de Materias</div>
+            <div class="ms-auto">
+                <button type="button" class="btn-close close" data-form="busqueda_materias"></button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row p-1">
+            <div class="col">
+                <table class="table table-sm table-hover table-dark" id="tblConsultaMaterias">
+                    <thead>
+                        <tr>
+                            <th>Buscar:</th>
+                            <th colspan="4">
+                                <input type="text" name="txtBuscarMaterias" id="txtBuscarMaterias" 
+                                    class="form-control" onkeyup="buscarMaterias(this.value)">
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>NOMBRE</th>
+                            <th>CODIGO</th>
+                            <th>DESCRIPCION</th>
+                        </tr>
+                    </thead>
+                    <tbody> </tbody>
+                </table>
+            </div>
+        </div>  
+    </div>
+</div>
+<script>
+    mostrarDatosMaterias();
+
+    function buscarMaterias(val){
+        mostrarDatosMaterias(val);
+    }
+    
+     function mostrarDatosMaterias(valor){
+        valor = valor || '';
+        fetch(`/buscar_materias`,{
+            method: 'POST',
+            body:j=JSON.stringify({buscar: valor})
+        }).then(resp=>resp.json())
+        .then(resp=>{
+            let $tblMaterias = document.querySelector("#tblConsultaMaterias > tbody"),
+                $filas = '';
+            resp.forEach(materia => {
+                $filas += `
+                    <tr onClick='modificarMateria(${ JSON.stringify(materia) })'>
+                        <td>${materia.nombre}</td>
+                        <td>${materia.codigo}</td>
+                        <td>${materia.descripcion}</td>
+                        <td><button onClick='eliminarMateria(${ JSON.stringify(materia) })' class="btn btn-danger">Eliminar</button></td>
+                    </tr>
+                `;
+            });
+            $tblMaterias.innerHTML = $filas;
+        });
+    }
+    function modificarMateria(materia){
+        frmMaterias.dataset.accion = "modificar";
+        frmMaterias.dataset.idmateria= materia.idMateria;
+        txtNombreMaterias.value = materia.nombre;
+        txtCodigoMaterias.value = materia.codigo;
+        txtDescripcionMaterias.value = materia.descripcion;
+    }
+    function eliminarMateria(materia){
+        if( confirm(`Esta seguro de eliminar a: ${materia.nombre}`) ){
+            fetch("/materias", {
+                method: "POST",
+                body: JSON.stringify({accion: "eliminar", idMateria: materia.idMateria})
+            }).then(resp=>resp.json())
+            .then(respuesta=>{
+                if( respuesta.msg=="ok" ){
+                    limpiarDatosMaterias();
+                    mostrarDatosMaterias();
+                }
+            });
+        }
+    }
+</script>
